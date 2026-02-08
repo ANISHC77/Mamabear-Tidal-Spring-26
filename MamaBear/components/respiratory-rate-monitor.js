@@ -10,9 +10,9 @@ const WS_URL = 'wss://huffily-triploblastic-tabetha.ngrok-free.dev';
 
 const screenWidth = Dimensions.get('window').width;
 
-export default function HeartRateMonitor() {
-  const [currentHeartRate, setCurrentHeartRate] = useState('--');
-  const [heartRateHistory, setHeartRateHistory] = useState([]);
+export default function RespiratoryRateMonitor() {
+  const [currentRespiratoryRate, setCurrentRespiratoryRate] = useState('--');
+  const [respiratoryRateHistory, setRespiratoryRateHistory] = useState([]);
   const [connectionStatus, setConnectionStatus] = useState('DISCONNECTED');
   const [status, setStatus] = useState('CONNECTING...');
   const ws = useRef(null);
@@ -41,15 +41,15 @@ export default function HeartRateMonitor() {
     ws.current.onmessage = (e) => {
       try {
         const parsed = JSON.parse(e.data);
-        setCurrentHeartRate(parsed.bpm || '--');
+        setCurrentRespiratoryRate(parsed.rpm || '--');
         setStatus(parsed.status || 'UNKNOWN');
         
         // Update waveform data
-        if (parsed.hr_wave && Array.isArray(parsed.hr_wave)) {
-          setHeartRateHistory(parsed.hr_wave);
+        if (parsed.rr_wave && Array.isArray(parsed.rr_wave)) {
+          setRespiratoryRateHistory(parsed.rr_wave);
         }
       } catch (err) {
-        console.error('Heart Rate JSON Parse Error:', err);
+        console.error('Respiratory Rate JSON Parse Error:', err);
       }
     };
 
@@ -66,11 +66,11 @@ export default function HeartRateMonitor() {
   };
 
   const chartData = {
-    labels: heartRateHistory.length > 0 ? heartRateHistory.map((_, index) => `${index}`) : ['0'],
+    labels: respiratoryRateHistory.length > 0 ? respiratoryRateHistory.map((_, index) => `${index}`) : ['0'],
     datasets: [
       {
-        data: heartRateHistory.length > 0 ? heartRateHistory : [0],
-        color: () => Colors[colorScheme ?? 'light'].tint,
+        data: respiratoryRateHistory.length > 0 ? respiratoryRateHistory : [16],
+        color: () => '#00BFFF', // Light blue for respiratory
         strokeWidth: 3,
       },
     ],
@@ -81,12 +81,10 @@ export default function HeartRateMonitor() {
     backgroundGradientFrom: Colors[colorScheme ?? 'light'].background,
     backgroundGradientTo: Colors[colorScheme ?? 'light'].background,
     decimalPlaces: 0,
-    color: () => '#00FF00', // Classic EKG green color
+    color: () => '#00BFFF', // Light blue for respiratory
     labelColor: (opacity = 1) => Colors[colorScheme ?? 'light'].text,
     style: {
-      borderRadius: 8, // Remove border radius for medical look
-      marginLeft: -70, // Shift graph left for better EKG style
-      paddingRight: 50, // Add padding to the right for better EKG style
+      borderRadius: 0, // Remove border radius for medical look
     },
     propsForDots: {
       r: '0', // Remove dots for cleaner EKG look
@@ -101,17 +99,19 @@ export default function HeartRateMonitor() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>❤️ Heart Rate Monitor</ThemedText>
+      <ThemedText type="title" style={styles.title}>🫁 Respiratory Rate Monitor</ThemedText>
       <ThemedView style={styles.currentContainer}>
-        <ThemedText type="subtitle">Current Heart Rate:</ThemedText>
-        <ThemedText type="title" style={styles.heartRate}>{currentHeartRate} BPM</ThemedText>
+        <ThemedText type="subtitle">Current Respiratory Rate:</ThemedText>
+        <ThemedText type="title" style={styles.respiratoryRate}>{currentRespiratoryRate} breaths/min</ThemedText>
+        <ThemedText type="subtitle" style={styles.status}>
+          Status: {status} | Connection: {connectionStatus}
+        </ThemedText>
       </ThemedView>
       <View style={styles.chartContainer}>
         <View style={styles.chartWrapper}>
           <LineChart
             data={chartData}
             width={screenWidth - 60}
-            marginBottom={-20}
             height={220}
             chartConfig={chartConfig}
             style={styles.chart}
@@ -120,12 +120,11 @@ export default function HeartRateMonitor() {
             withOuterLines={false}
             withVerticalLabels={false}
             withHorizontalLabels={false}
-            marginLeft={-30}
           />
         </View>
       </View>
       <ThemedText style={styles.note}>
-        Real-time EKG monitoring • {connectionStatus} • {status}
+        Real-time respiratory monitoring with live waveform
       </ThemedText>
     </ThemedView>
   );
@@ -144,10 +143,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 20,
   },
-  heartRate: {
+  respiratoryRate: {
     fontSize: 24,
-    color: '#FF6B6B',
+    color: '#00BFFF',
     marginTop: 10,
+  },
+  status: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 5,
   },
   chartContainer: {
     alignItems: 'center',

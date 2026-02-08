@@ -7,6 +7,7 @@ import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 import { Link } from 'expo-router';
 import HeartRateMonitor from '@/components/heart-rate-monitor';
+import RespiratoryRateMonitor from '@/components/respiratory-rate-monitor';
 
 export default function HomeScreen() {
   return (
@@ -23,6 +24,7 @@ export default function HomeScreen() {
         <HelloWave />
       </ThemedView>
       <HeartRateMonitor />
+      <RespiratoryRateMonitor />
       <ThemedView style={styles.stepContainer}>
         <ThemedText type="subtitle">Step 1: Try it</ThemedText>
         <ThemedText>
