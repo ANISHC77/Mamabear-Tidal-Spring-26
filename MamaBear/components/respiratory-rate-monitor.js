@@ -6,7 +6,7 @@ import { ThemedView } from '@/components/themed-view';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
 
-const WS_URL = 'wss://huffily-triploblastic-tabetha.ngrok-free.dev';
+const WS_URL = 'wss://consisting-powell-width-kitty.trycloudflare.com';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -102,10 +102,7 @@ export default function RespiratoryRateMonitor() {
       <ThemedText type="title" style={styles.title}>🫁 Respiratory Rate Monitor</ThemedText>
       <ThemedView style={styles.currentContainer}>
         <ThemedText type="subtitle">Current Respiratory Rate:</ThemedText>
-        <ThemedText type="title" style={styles.respiratoryRate}>{currentRespiratoryRate} breaths/min</ThemedText>
-        <ThemedText type="subtitle" style={styles.status}>
-          Status: {status} | Connection: {connectionStatus}
-        </ThemedText>
+        <ThemedText type="title" style={[styles.respiratoryRate, { color: Colors[colorScheme ?? 'light'].tint }]}>{currentRespiratoryRate} breaths/min</ThemedText>
       </ThemedView>
       <View style={styles.chartContainer}>
         <View style={styles.chartWrapper}>
@@ -124,7 +121,7 @@ export default function RespiratoryRateMonitor() {
         </View>
       </View>
       <ThemedText style={styles.note}>
-        Real-time respiratory monitoring with live waveform
+        Status: {status} | Connection: {connectionStatus}
       </ThemedText>
     </ThemedView>
   );
@@ -145,13 +142,7 @@ const styles = StyleSheet.create({
   },
   respiratoryRate: {
     fontSize: 24,
-    color: '#00BFFF',
     marginTop: 10,
-  },
-  status: {
-    fontSize: 14,
-    color: '#666',
-    marginTop: 5,
   },
   chartContainer: {
     alignItems: 'center',

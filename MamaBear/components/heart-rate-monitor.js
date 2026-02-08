@@ -6,7 +6,7 @@ import { ThemedView } from '@/components/themed-view';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
 
-const WS_URL = 'wss://huffily-triploblastic-tabetha.ngrok-free.dev';
+const WS_URL = 'wss://consisting-powell-width-kitty.trycloudflare.com';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -104,7 +104,7 @@ export default function HeartRateMonitor() {
       <ThemedText type="title" style={styles.title}>❤️ Heart Rate Monitor</ThemedText>
       <ThemedView style={styles.currentContainer}>
         <ThemedText type="subtitle">Current Heart Rate:</ThemedText>
-        <ThemedText type="title" style={styles.heartRate}>{currentHeartRate} BPM</ThemedText>
+        <ThemedText type="title" style={[styles.heartRate, { color: Colors[colorScheme ?? 'light'].accent }]}>{currentHeartRate} BPM</ThemedText>
       </ThemedView>
       <View style={styles.chartContainer}>
         <View style={styles.chartWrapper}>
@@ -125,7 +125,7 @@ export default function HeartRateMonitor() {
         </View>
       </View>
       <ThemedText style={styles.note}>
-        Real-time EKG monitoring • {connectionStatus} • {status}
+        Status: {status} | Connection: {connectionStatus}
       </ThemedText>
     </ThemedView>
   );
@@ -146,7 +146,6 @@ const styles = StyleSheet.create({
   },
   heartRate: {
     fontSize: 24,
-    color: '#FF6B6B',
     marginTop: 10,
   },
   chartContainer: {
