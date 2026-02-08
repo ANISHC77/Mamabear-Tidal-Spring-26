@@ -72,8 +72,11 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 32,
-    gap: 16,
+    padding: 16,
+    gap: 12,
     overflow: 'hidden',
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    marginTop: -24,
   },
 });

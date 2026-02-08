@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { View, StyleSheet, Dimensions } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { ThemedText } from '@/components/themed-text';
@@ -6,7 +6,7 @@ import { ThemedView } from '@/components/themed-view';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
 
-const WS_URL = 'wss://consisting-powell-width-kitty.trycloudflare.com';
+const WS_URL = 'wss://athletics-agrees-drug-muslim.trycloudflare.com/';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -17,16 +17,10 @@ export default function HeartRateMonitor() {
   const [status, setStatus] = useState('CONNECTING...');
   const ws = useRef(null);
   const colorScheme = useColorScheme();
+  const lastDefinedBpm = useRef(null);
+  const lastDefinedWave = useRef([]);
 
-  useEffect(() => {
-    connect();
-    // Cleanup on unmount
-    return () => {
-      if (ws.current) ws.current.close();
-    };
-  }, []);
-
-  const connect = () => {
+  const connect = useCallback(() => {
     // Prevent multiple connections
     if (ws.current && (ws.current.readyState === WebSocket.OPEN || ws.current.readyState === WebSocket.CONNECTING)) return;
 
@@ -41,12 +35,26 @@ export default function HeartRateMonitor() {
     ws.current.onmessage = (e) => {
       try {
         const parsed = JSON.parse(e.data);
-        setCurrentHeartRate(parsed.bpm || '--');
+        if (typeof parsed.bpm === 'number') {
+          lastDefinedBpm.current = parsed.bpm;
+          setCurrentHeartRate(parsed.bpm);
+        } else if (lastDefinedBpm.current !== null) {
+          setCurrentHeartRate(lastDefinedBpm.current);
+        }
+        console.log('Received Heart Rate Data:', parsed.bpm);
         setStatus(parsed.status || 'UNKNOWN');
         
         // Update waveform data
         if (parsed.hr_wave && Array.isArray(parsed.hr_wave)) {
-          setHeartRateHistory(parsed.hr_wave);
+          const allNumbers = parsed.hr_wave.every((value) => typeof value === 'number');
+          if (allNumbers) {
+            lastDefinedWave.current = parsed.hr_wave;
+            setHeartRateHistory(parsed.hr_wave);
+          } else if (lastDefinedWave.current.length > 0) {
+            setHeartRateHistory(lastDefinedWave.current);
+          }
+        } else if (lastDefinedWave.current.length > 0) {
+          setHeartRateHistory(lastDefinedWave.current);
         }
       } catch (err) {
         console.error('Heart Rate JSON Parse Error:', err);
@@ -63,7 +71,15 @@ export default function HeartRateMonitor() {
     ws.current.onerror = (e) => {
       setConnectionStatus('ERROR');
     };
-  };
+  }, []);
+
+  useEffect(() => {
+    connect();
+    // Cleanup on unmount
+    return () => {
+      if (ws.current) ws.current.close();
+    };
+  }, [connect]);
 
   const chartData = {
     labels: heartRateHistory.length > 0 ? heartRateHistory.map((_, index) => `${index}`) : ['0'],
@@ -77,19 +93,17 @@ export default function HeartRateMonitor() {
   };
 
   const chartConfig = {
-    backgroundColor: Colors[colorScheme ?? 'light'].background,
-    backgroundGradientFrom: Colors[colorScheme ?? 'light'].background,
-    backgroundGradientTo: Colors[colorScheme ?? 'light'].background,
+    backgroundColor: Colors[colorScheme ?? 'light'].card,
+    backgroundGradientFrom: Colors[colorScheme ?? 'light'].card,
+    backgroundGradientTo: Colors[colorScheme ?? 'light'].card,
     decimalPlaces: 0,
-    color: () => '#00FF00', // Classic EKG green color
+    color: () => Colors[colorScheme ?? 'light'].heartRate,
     labelColor: (opacity = 1) => Colors[colorScheme ?? 'light'].text,
     style: {
-      borderRadius: 8, // Remove border radius for medical look
-      marginLeft: -70, // Shift graph left for better EKG style
-      paddingRight: 50, // Add padding to the right for better EKG style
+      borderRadius: 16,
     },
     propsForDots: {
-      r: '0', // Remove dots for cleaner EKG look
+      r: '0',
     },
     propsForBackgroundLines: {
       strokeWidth: 0,
@@ -101,10 +115,10 @@ export default function HeartRateMonitor() {
 
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>❤️ Heart Rate Monitor</ThemedText>
+      <ThemedText type="title" style={styles.title}>❤️ Heart Rate</ThemedText>
       <ThemedView style={styles.currentContainer}>
-        <ThemedText type="subtitle">Current Heart Rate:</ThemedText>
-        <ThemedText type="title" style={[styles.heartRate, { color: Colors[colorScheme ?? 'light'].accent }]}>{currentHeartRate} BPM</ThemedText>
+        <ThemedText type="subtitle" style={{ opacity: 0.6, fontSize: 15, fontWeight: '600', backgroundColor: 'transparent' }}>Current BPM</ThemedText>
+        <ThemedText type="title" style={{ color: Colors[colorScheme ?? 'light'].heartRate }}>{currentHeartRate}</ThemedText>
       </ThemedView>
       <View style={styles.chartContainer}>
         <View style={styles.chartWrapper}>
@@ -125,7 +139,7 @@ export default function HeartRateMonitor() {
         </View>
       </View>
       <ThemedText style={styles.note}>
-        Status: {status} | Connection: {connectionStatus}
+        {status} • {connectionStatus}
       </ThemedText>
     </ThemedView>
   );
@@ -133,45 +147,60 @@ export default function HeartRateMonitor() {
 
 const styles = StyleSheet.create({
   container: {
+    margin: 16,
     padding: 20,
-    marginVertical: 20,
+    borderRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 5,
   },
   title: {
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 24,
+    fontSize: 22,
+    fontWeight: '700',
+    letterSpacing: 0.3,
   },
   currentContainer: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 24,
+    paddingVertical: 40,
+    paddingHorizontal: 36,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255, 45, 85, 0.08)',
   },
   heartRate: {
-    fontSize: 24,
-    marginTop: 10,
+    fontSize: 64,
+    marginTop: 12,
+    fontWeight: '700',
+    letterSpacing: -1,
+
   },
   chartContainer: {
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
-    flex: 1,
+    marginVertical: 16,
   },
   chartWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-
+    width: '100%',
+    borderRadius: 16,
+    overflow: 'hidden',
+    backgroundColor: 'rgba(0, 0, 0,)',
   },
   chart: {
-    marginVertical: 0,
-    borderRadius: 20, // Medical style - no rounded corners
-    borderWidth: 1,
-    width: '50%',
-    borderColor: '#333',
-    alignSelf: 'center',
-    backgroundColor: 'black', // Black background for EKG style
+    marginVertical: 8,
+    borderRadius: 16,
   },
   note: {
     textAlign: 'center',
-    marginTop: 10,
-    fontSize: 12,
-    opacity: 0.7,
+    marginTop: 16,
+    fontSize: 13,
+    opacity: 0.6,
+    fontWeight: '500',
   },
 });

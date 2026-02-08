@@ -12,9 +12,27 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].accent,
+        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarInactiveTintColor: Colors[colorScheme ?? 'light'].tabIconDefault,
         headerShown: false,
         tabBarButton: HapticTab,
+        tabBarStyle: {
+          backgroundColor: Colors[colorScheme ?? 'light'].card,
+          borderTopWidth: 0,
+          elevation: 0,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.05,
+          shadowRadius: 8,
+          height: 88,
+          paddingBottom: 34,
+          paddingTop: 8,
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '600',
+          letterSpacing: 0.1,
+        },
       }}>
       <Tabs.Screen
         name="index"
@@ -31,10 +49,10 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="recordings"
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
+          title: 'Recordings',
+          tabBarIcon: ({ color }) => <IconSymbol size={28} name="video.fill" color={color} />,
         }}
       />
       <Tabs.Screen
