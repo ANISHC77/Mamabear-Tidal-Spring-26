@@ -11,7 +11,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import HeartRateMonitor from '@/components/heart-rate-monitor';
 import RespiratoryRateMonitor from '@/components/respiratory-rate-monitor';
 
-const WS_URL = 'wss://athletics-agrees-drug-muslim.trycloudflare.com/';
+const WS_URL = 'wss://thehun-christine-relocation-additional.trycloudflare.com/';
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const VIDEO_HEIGHT = 240;
 const RECORDINGS_KEY = '@mama_bear_recordings';

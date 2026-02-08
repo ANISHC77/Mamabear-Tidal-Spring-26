@@ -6,7 +6,7 @@ import { ThemedView } from '@/components/themed-view';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
 
-const WS_URL = 'wss://athletics-agrees-drug-muslim.trycloudflare.com/';
+const WS_URL = 'wss://thehun-christine-relocation-additional.trycloudflare.com/';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -41,7 +41,6 @@ export default function HeartRateMonitor() {
         } else if (lastDefinedBpm.current !== null) {
           setCurrentHeartRate(lastDefinedBpm.current);
         }
-        console.log('Received Heart Rate Data:', parsed.bpm);
         setStatus(parsed.status || 'UNKNOWN');
         
         // Update waveform data

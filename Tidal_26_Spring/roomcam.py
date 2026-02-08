@@ -113,23 +113,30 @@ class RoomCamServer:
             
             # 3. ASK GEMINI
             prompt = """
-            Compare these two images.
-            Image 1 is a collage of ALL AUTHORIZED USERS (The Team).
-            Image 2 is the CURRENT ROOM VIEW.
+            You are a CRITICAL SECURITY SYSTEM analyzing images for EXACT facial recognition matches.
             
-            Task:
-            Is ANY person from the Team (Image 1) present in the Room (Image 2)?
+            Image 1: Collage of ALL AUTHORIZED USERS (The Team) - These are the ONLY approved faces.
+            Image 2: CURRENT ROOM VIEW - You must identify if ANY of these exact people are present.
             
-            Rules:
-            1. If AT LEAST ONE authorized user is in the room, return "SAFE" (even if strangers are there too).
-            2. If NO authorized users are in the room, return "DANGER".
-            3. Ignore lighting/angle differences.
+            STRICT COMPARISON RULES:
+            1. Match facial features PRECISELY: eye shape, nose structure, facial proportions, jawline, and overall face geometry.
+            2. A match requires MULTIPLE distinguishing features to align - NOT just general resemblance.
+            3. DO NOT match based on: clothing, hair color/style alone, skin tone alone, or general "looks similar."
+            4. Lighting and angle differences are acceptable ONLY if the core facial structure clearly matches.
+            5. If you have ANY doubt or uncertainty about a match, classify as NO MATCH.
+            6. Return "authorized_person_present: true" ONLY if you can confidently identify the SAME PERSON with HIGH certainty.
+            7. Partial matches, similar-looking people, or "maybe" scenarios = INTRUDER (false).
+            
+            DECISION LOGIC:
+            - If AT LEAST ONE face in Room matches an Authorized User with HIGH confidence → "authorized_person_present": true
+            - If NO faces match OR confidence is LOW → "authorized_person_present": false
+            - When unsure, default to false (treat as intruder for safety)
             
             Return JSON:
             {
-                "authorized_person_present": bool, 
+                "authorized_person_present": bool,
                 "confidence": "HIGH" or "LOW",
-                "description": "Short description (e.g. 'User detected' or 'Unknown person only')"
+                "description": "Detailed explanation (e.g., 'Authorized user John detected - facial structure matches' or 'Unknown person - no facial match found')"
             }
             """
             

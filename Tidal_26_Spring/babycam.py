@@ -400,7 +400,7 @@ class NannyCamServer:
 async def main():
     server = NannyCamServer()
     print("🚀 Starting NannyCam...")
-    async with websockets.serve(server.register_client, "0.0.0.0", 8765):
+    async with websockets.serve(server.register_client, "0.0.0.0", 8766):
         await asyncio.gather(
             server.run(),
             server.broadcast_audio()

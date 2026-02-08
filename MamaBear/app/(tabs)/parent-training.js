@@ -3,7 +3,7 @@ import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator, Ale
 import { CameraView, useCameraPermissions } from 'expo-camera';
 
 // ⚠️ REPLACE WITH YOUR PYTHON SERVER IP
-const SERVER_IP = '10.246.255.37';
+const SERVER_IP = '10.244.95.28';
 const WS_URL = `ws://${SERVER_IP}:8766`;
 
 export default function RoomCam() {

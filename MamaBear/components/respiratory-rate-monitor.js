@@ -6,7 +6,7 @@ import { ThemedView } from '@/components/themed-view';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { Colors } from '@/constants/theme';
 
-const WS_URL = 'wss://athletics-agrees-drug-muslim.trycloudflare.com/';
+const WS_URL = 'wss://thehun-christine-relocation-additional.trycloudflare.com/';
 
 const screenWidth = Dimensions.get('window').width;
 
